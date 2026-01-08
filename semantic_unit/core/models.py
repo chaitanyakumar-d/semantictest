@@ -12,15 +12,15 @@ from pydantic import BaseModel, Field, field_validator
 class DriftResult(BaseModel):
     """
     Represents the semantic drift measurement between actual and expected outputs.
-    
+
     This model quantifies the divergence in semantic meaning through distributional
     alignment scores and provides interpretable reasoning for the measured drift.
-    
+
     Attributes
     ----------
     score : float
-        Semantic alignment coefficient ranging from 0.0 (complete divergence) to 
-        1.0 (perfect alignment). This represents the cosine similarity in the 
+        Semantic alignment coefficient ranging from 0.0 (complete divergence) to
+        1.0 (perfect alignment). This represents the cosine similarity in the
         latent semantic space between the actual and expected representations.
     reasoning : str
         Detailed explanation of the semantic entropy analysis, including specific
@@ -35,7 +35,7 @@ class DriftResult(BaseModel):
     metadata : dict, optional
         Additional evaluation metadata including token counts, latency metrics,
         and confidence intervals.
-    
+
     Examples
     --------
     >>> result = DriftResult(
@@ -45,51 +45,34 @@ class DriftResult(BaseModel):
     ...     expected="The experiment was successful"
     ... )
     """
-    
+
     score: float = Field(
-        ...,
-        ge=0.0,
-        le=1.0,
-        description="Semantic alignment score between 0.0 and 1.0"
+        ..., ge=0.0, le=1.0, description="Semantic alignment score between 0.0 and 1.0"
     )
     reasoning: str = Field(
-        ...,
-        min_length=1,
-        description="Detailed explanation of the semantic evaluation"
+        ..., min_length=1, description="Detailed explanation of the semantic evaluation"
     )
-    actual: str = Field(
-        ...,
-        description="The actual output text being evaluated"
-    )
-    expected: str = Field(
-        ...,
-        description="The expected reference text"
-    )
-    model: Optional[str] = Field(
-        default=None,
-        description="Language model used for evaluation"
-    )
-    metadata: Optional[dict] = Field(
-        default=None,
-        description="Additional evaluation metadata"
-    )
-    
+    actual: str = Field(..., description="The actual output text being evaluated")
+    expected: str = Field(..., description="The expected reference text")
+    model: Optional[str] = Field(default=None, description="Language model used for evaluation")
+    metadata: Optional[dict] = Field(default=None, description="Additional evaluation metadata")
+
     @field_validator("score")
     @classmethod
     def validate_score_bounds(cls, v: float) -> float:
         """
         Validate that the semantic alignment score falls within valid bounds.
-        
+
         Parameters
         ----------
         v : float
             The score value to validate
-            
+
         Returns
         -------
         float
             The validated score
-            
+
         Raises
         ------
         ValueError
@@ -98,7 +81,7 @@ class DriftResult(BaseModel):
         if not 0.0 <= v <= 1.0:
             raise ValueError(f"Score must be between 0.0 and 1.0, got {v}")
         return v
-    
+
     model_config = {
         "json_schema_extra": {
             "example": {
@@ -107,7 +90,7 @@ class DriftResult(BaseModel):
                 "actual": "The model achieved 95% accuracy",
                 "expected": "Model accuracy reached 95%",
                 "model": "gpt-4o-mini",
-                "metadata": {"tokens": 45, "latency_ms": 234}
+                "metadata": {"tokens": 45, "latency_ms": 234},
             }
         }
     }
