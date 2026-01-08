@@ -6,10 +6,10 @@ Semantic Unit is maintained as a research artifact under strict academic standar
 
 ## Maintainer
 
-**Principal Maintainer**: [Your Name]  
-**Affiliation**: [Your Institution/Independent Researcher]  
-**Contact**: your.email@example.com  
-**ORCID**: [Your ORCID if available]
+**Principal Maintainer**: Chaitanya Kumar Dasari
+**Affiliation**: Independent Researcher
+**Contact**: chaitanyakumar435@outlook.com
+**ORCID**: https://orcid.org/0009-0002-8935-6232
 
 The Principal Maintainer holds final authority on all technical and conceptual decisions, ensuring the framework maintains its research integrity and methodological consistency with published evaluation standards.
 
@@ -117,38 +117,38 @@ All public functions, classes, and modules must include:
 def evaluate(self, actual: str, expected: str) -> DriftResult:
     """
     Evaluate semantic drift between actual and expected outputs.
-    
+
     This method quantifies distributional divergence in the latent
     semantic space using zero-shot LLM-based comparison.
-    
+
     Parameters
     ----------
     actual : str
         Observed output from the system under evaluation
     expected : str
         Reference ground truth for comparison
-        
+
     Returns
     -------
     DriftResult
         Structured evaluation containing alignment score and reasoning
-        
+
     Raises
     ------
     ValueError
         If inputs are empty or invalid
-        
+
     Examples
     --------
     >>> judge = SemanticJudge()
     >>> result = judge.evaluate("Output A", "Expected A")
     >>> print(f"Score: {result.score}")
-    
+
     Notes
     -----
     Evaluation uses temperature=0.0 for deterministic results.
     Minor variations may occur due to model version updates.
-    
+
     References
     ----------
     .. [1] Liu et al. (2023). "G-Eval: NLG Evaluation..."
@@ -230,7 +230,7 @@ For collaborative research projects involving framework extensions:
 Accepted contributions are recognized through:
 
 1. **GitHub Contribution Graph**: Automatic tracking of commits
-2. **Release Notes**: Credit in version release announcements  
+2. **Release Notes**: Credit in version release announcements
 3. **Contributors File**: Listed in project documentation
 4. **Research Acknowledgments**: Significant contributions acknowledged in papers
 
@@ -269,6 +269,6 @@ We acknowledge the broader research community working on LLM evaluation, includi
 
 ---
 
-**Last Updated**: January 7, 2026  
-**Version**: 1.0  
-**Principal Maintainer**: [Your Name]
+**Last Updated**: January 7, 2026
+**Version**: 1.0
+**Principal Maintainer**: Chaitanya Kumar Dasari
