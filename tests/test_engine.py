@@ -49,9 +49,9 @@ class TestSemanticJudge:
         # Mock LiteLLM response
         mock_response = Mock()
         mock_response.choices = [Mock()]
-        mock_response.choices[
-            0
-        ].message.content = '{"score": 0.95, "reasoning": "High semantic alignment observed"}'
+        mock_response.choices[0].message.content = (
+            '{"score": 0.95, "reasoning": "High semantic alignment observed"}'
+        )
         mock_response.usage.total_tokens = 150
         mock_completion.return_value = mock_response
 
@@ -72,9 +72,9 @@ class TestSemanticJudge:
         """Test evaluation with custom metadata."""
         mock_response = Mock()
         mock_response.choices = [Mock()]
-        mock_response.choices[
-            0
-        ].message.content = '{"score": 0.88, "reasoning": "Minor drift detected"}'
+        mock_response.choices[0].message.content = (
+            '{"score": 0.88, "reasoning": "Minor drift detected"}'
+        )
         mock_response.usage.total_tokens = 120
         mock_completion.return_value = mock_response
 
