@@ -247,8 +247,8 @@ Substantial intellectual contributions may warrant co-authorship on research pap
 
 ### Technical Questions
 
-- **GitHub Discussions**: For implementation questions and design discussions
-- **GitHub Issues**: For bug reports and feature requests  
+- **GitHub Discussions**: https://github.com/chaitanyakumar-d/semantic-unit/discussions
+- **GitHub Issues**: https://github.com/chaitanyakumar-d/semantic-unit/issues
 - **Email**: Direct maintainer contact for sensitive issues
 
 ### Research Inquiries

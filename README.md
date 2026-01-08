@@ -1,19 +1,43 @@
-# Semantic Unit: Deterministic Evaluation Standard
+# Semantic Unit: Unit Testing for AI Agents
 
-A modern, deterministic evaluation framework for semantic units, providing standardized quality assurance and testing capabilities.
+> **Stop your AI from hallucinating in production with one line of code.**
 
-## Overview
+A modern testing framework that brings unit testing to AI agents. Test for **meaning**, not syntax. Catch AI hallucinations before they reach production.
 
-Semantic Unit provides a robust framework for evaluating and testing semantic components with deterministic, reproducible results. Built with modern Python best practices, it offers a comprehensive CLI and programmatic API for quality assurance workflows.
+## The Problem
 
-## Features
+Traditional testing breaks with AI:
 
-- 🎯 **Deterministic Evaluation**: Consistent, reproducible evaluation results
-- 🚀 **Modern CLI**: Built with Typer and Rich for excellent user experience
-- 📊 **Structured Output**: Pydantic-based data validation and serialization
-- 🔌 **LLM Integration**: Powered by LiteLLM for flexible model support
-- ⚙️ **Configurable**: Environment-based configuration with python-dotenv
-- 🧪 **Well-Tested**: Comprehensive test suite with pytest
+```python
+# ❌ This fails even when AI is correct
+assert ai_response == "The test passed successfully"
+# AI says: "The test was successful" → TEST FAILS (but meaning is correct!)
+```
+
+AI outputs are **never** identical, even when correct. Your tests shouldn't break on paraphrasing.
+
+## The Solution
+
+```python
+from semantic_unit import SemanticJudge
+
+judge = SemanticJudge()
+result = judge.evaluate(
+    actual=ai_response,
+    expected="The test passed successfully"
+)
+
+assert result.score > 0.8  # ✅ Tests meaning, not exact words
+```
+
+## Why Semantic Unit?
+
+- 🎯 **Test Meaning, Not Words**: Assert on semantic correctness, not string equality
+- 🛡️ **Prevent Hallucinations**: Catch AI drift before it reaches users
+- ⚡ **Drop-in Replacement**: Works with pytest, unittest, or any test framework
+- 🔬 **Deterministic**: Reproducible results for reliable CI/CD
+- 📊 **Actionable Insights**: Get explanations for why tests pass/fail
+- 🚀 **Production Ready**: Battle-tested with comprehensive test coverage
 
 ## Installation
 
@@ -39,64 +63,150 @@ pip install -e ".[dev]"
 
 ## Quick Start
 
-### CLI Usage
+### Installation
 
 ```bash
-# Run semantic unit evaluation
-semantic-unit evaluate --input data.json
-
-# Check version
-semantic-unit --version
-
-# Get help
-semantic-unit --help
+pip install semantic-unit
 ```
 
-### Python API
+Or from source:
+
+```bash
+git clone https://github.com/chaitanyakumar-d/semantic-unit.git
+cd semantic-unit
+pip install -e .
+```
+
+### Basic Usage
+
+**1. Testing AI Responses:**
 
 ```python
-from semantic_unit.core import Evaluator
+from semantic_unit import SemanticJudge
 
-# Initialize evaluator
-evaluator = Evaluator()
+judge = SemanticJudge()
 
-# Run evaluation
-result = evaluator.evaluate(data)
-print(result)
+# Your AI agent's output
+ai_output = "The experiment succeeded with 95% accuracy"
+expected = "The experiment achieved 95% accuracy"
+
+# Test semantic correctness
+result = judge.evaluate(ai_output, expected)
+
+if result.score > 0.8:
+    print("✓ AI response is correct")
+else:
+    print(f"✗ AI drifted: {result.reasoning}")
 ```
 
-## Project Structure
+**2. Integration with pytest:**
 
+```python
+import pytest
+from semantic_unit import SemanticJudge
+
+@pytest.fixture
+def judge():
+    return SemanticJudge()
+
+def test_ai_customer_support(judge):
+    ai_response = get_ai_response("What's your return policy?")
+    expected = "We accept returns within 30 days"
+    
+    result = judge.evaluate(ai_response, expected)
+    assert result.score > 0.8, f"AI hallucinated: {result.reasoning}"
+
+def test_ai_summarization(judge):
+    summary = ai_summarize(long_document)
+    expected_points = "Revenue increased, costs decreased, profit margins improved"
+    
+    result = judge.evaluate(summary, expected_points)
+    assert result.score > 0.7, "Summary missing key points"
 ```
-semantic-unit/
-├── semantic_unit/
-│   ├── core/          # Core evaluation logic
-│   ├── cli/           # Command-line interface
-│   └── __init__.py
-├── tests/             # Test suite
-├── pyproject.toml     # Project configuration
-├── README.md          # This file
-└── .gitignore         # Git ignore rules
+
+**3. CLI Usage:**
+
+```bash
+# Quick evaluation
+semantic-unit evaluate "AI said this" "Should mean this"
+
+# Batch testing
+semantic-unit batch test_cases.json --output results.json
+
+# With custom model
+semantic-unit evaluate "text" "expected" --model gpt-4
 ```
 
-## Requirements
+## Real-World Use Cases
 
-- Python 3.9+
-- litellm
-- typer
-- rich
-- pydantic
-- python-dotenv
+### 1. **AI Chatbot Testing**
+```python
+# Test customer support AI doesn't hallucinate policies
+result = judge.evaluate(
+    actual=chatbot_response,
+    expected="We offer 24/7 support with 1-hour response time"
+)
+assert result.score > 0.9, "Chatbot gave wrong information!"
+```
+
+### 2. **RAG Pipeline Validation**
+```python
+# Ensure retrieval-augmented generation stays accurate
+result = judge.evaluate(
+    actual=rag_output,
+    expected=ground_truth_answer
+)
+assert result.score > 0.85, "RAG hallucinated facts"
+```
+
+### 3. **AI Agent Monitoring**
+```python
+# Production monitoring for AI drift
+for ai_response in production_logs:
+    result = judge.evaluate(ai_response, expected_behavior)
+    if result.score < 0.7:
+        alert_team(f"AI drift detected: {result.reasoning}")
+```
+
+### 4. **Fine-tuning Validation**
+```python
+# Verify fine-tuned model maintains accuracy
+test_cases = load_test_suite()
+results = judge.batch_evaluate(test_cases)
+avg_score = sum(r.score for r in results) / len(results)
+assert avg_score > 0.8, "Fine-tuning degraded performance"
+```
+
+## Who Uses Semantic Unit?
+
+- **AI Engineers**: Testing LLM applications and agents
+- **QA Teams**: Automated testing of AI features
+- **DevOps**: Monitoring AI systems in production
+- **Researchers**: Evaluating model performance
+- **Startups**: Shipping AI products with confidence
 
 ## Configuration
 
-Create a `.env` file in your project root:
+Create a `.env` file:
 
-```env
-# Example configuration
-SEMANTIC_UNIT_API_KEY=your-api-key
-SEMANTIC_UNIT_MODEL=gpt-4
-SEMANTIC_UNIT_DEBUG=false
+```bash
+OPENAI_API_KEY=your-openai-key
+```
+
+Or set environment variable:
+
+```bash
+export OPENAI_API_KEY=your-key
+```
+
+Advanced options:
+
+```python
+judge = SemanticJudge(
+    model="gpt-4o-mini",    # Or gpt-4, claude, etc.
+    temperature=0.0,         # Deterministic results
+    max_tokens=500          # Response length
+)
 ```
 
 ## Development
@@ -155,20 +265,35 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## Why This Matters
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+**AI is everywhere, but testing AI is broken.**
 
-## Acknowledgments
+- Traditional tests: `assert output == expected` ❌
+- Semantic Unit: `assert meaning_matches(output, expected)` ✅
 
-Built with modern Python tools:
-- [LiteLLM](https://github.com/BerriAI/litellm) - Universal LLM API
-- [Typer](https://typer.tiangolo.com/) - CLI framework
-- [Rich](https://rich.readthedocs.io/) - Terminal formatting
-- [Pydantic](https://docs.pydantic.dev/) - Data validation
-- [python-dotenv](https://github.com/theskumar/python-dotenv) - Environment management
+**The difference?** Your AI can now:
+- Paraphrase freely without breaking tests
+- Improve responses without false failures  
+- Scale to production with confidence
 
-## Contact
+## Repository & Links
+
+- **GitHub**: https://github.com/chaitanyakumar-d/semantic-unit
+- **Issues**: https://github.com/chaitanyakumar-d/semantic-unit/issues
+- **Discussions**: https://github.com/chaitanyakumar-d/semantic-unit/discussions
+
+## Roadmap
+
+- [x] Core semantic evaluation engine
+- [x] CLI with evaluate and batch commands
+- [x] Comprehensive test suite (20+ tests)
+- [x] CI/CD with GitHub Actions
+- [ ] PyPI publication
+- [ ] Additional evaluation metrics
+- [ ] Performance benchmarks
+- [ ] Documentation website
+- [ ] Integration examples (LangChain, LlamaIndex, etc.)
 
 - GitHub: [https://github.com/yourusername/semantic-unit](https://github.com/yourusername/semantic-unit)
 - Issues: [https://github.com/yourusername/semantic-unit/issues](https://github.com/yourusername/semantic-unit/issues)

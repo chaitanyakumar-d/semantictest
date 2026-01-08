@@ -18,8 +18,8 @@ authors:
     orcid: "https://orcid.org/0000-0000-0000-0000"
 version: 0.1.0
 date-released: 2026-01-07
-url: "https://github.com/yourusername/semantic-unit"
-repository-code: "https://github.com/yourusername/semantic-unit"
+url: "https://github.com/chaitanyakumar-d/semantic-unit"
+repository-code: "https://github.com/chaitanyakumar-d/semantic-unit"
 license: MIT
 keywords:
   - machine-learning
@@ -40,8 +40,8 @@ preferred-citation:
       email: your.email@example.com
       affiliation: "Independent Researcher / Your Affiliation"
   year: 2026
-  url: "https://github.com/yourusername/semantic-unit"
-  notes: "Open-source framework for semantic drift detection in AI systems"
+  url: "https://github.com/chaitanyakumar-d/semantic-unit"
+  notes: "Open-source framework for unit testing AI agents and preventing hallucinations"
 references:
   - type: article
     title: "G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment"

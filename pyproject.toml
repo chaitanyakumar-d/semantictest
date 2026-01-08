@@ -54,10 +54,10 @@ dev = [
 semantic-unit = "semantic_unit.cli.main:app"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/semantic-unit"
-Documentation = "https://semantic-unit.readthedocs.io"
-Repository = "https://github.com/yourusername/semantic-unit"
-Issues = "https://github.com/yourusername/semantic-unit/issues"
+Homepage = "https://github.com/chaitanyakumar-d/semantic-unit"
+Documentation = "https://github.com/chaitanyakumar-d/semantic-unit#readme"
+Repository = "https://github.com/chaitanyakumar-d/semantic-unit"
+Issues = "https://github.com/chaitanyakumar-d/semantic-unit/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
