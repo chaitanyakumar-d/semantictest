@@ -179,26 +179,62 @@ assert avg_score > 0.8, "Fine-tuning degraded performance"
 
 ## Configuration
 
+### API Keys
+
 Create a `.env` file:
 
 ```bash
+# OpenAI (default)
 OPENAI_API_KEY=your-openai-key
+
+# Or use other providers:
+ANTHROPIC_API_KEY=your-anthropic-key
+GEMINI_API_KEY=your-google-key
+GROQ_API_KEY=your-groq-key
+AZURE_API_KEY=your-azure-key
+AZURE_API_BASE=https://your-resource.openai.azure.com
 ```
 
-Or set environment variable:
+### Supported LLM Providers
 
-```bash
-export OPENAI_API_KEY=your-key
-```
+Semantic Unit supports **100+ LLMs** via LiteLLM:
 
-Advanced options:
+| Provider | Models | Environment Variable |
+|----------|--------|---------------------|
+| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-4-turbo` | `OPENAI_API_KEY` |
+| **Anthropic** | `claude-3-5-sonnet-20241022`, `claude-3-opus-20240229` | `ANTHROPIC_API_KEY` |
+| **Google** | `gemini/gemini-1.5-pro`, `gemini/gemini-1.5-flash` | `GEMINI_API_KEY` |
+| **Azure** | `azure/gpt-4o`, `azure/gpt-4` | `AZURE_API_KEY` + `AZURE_API_BASE` |
+| **Groq** | `groq/llama-3.1-70b-versatile`, `groq/mixtral-8x7b-32768` | `GROQ_API_KEY` |
+| **Ollama** | `ollama/llama3.1`, `ollama/mistral` | Local (no key needed) |
+| **AWS Bedrock** | `bedrock/anthropic.claude-3-sonnet` | AWS credentials |
+| **Together AI** | `together_ai/meta-llama/Llama-3-70b-chat-hf` | `TOGETHER_API_KEY` |
+
+### Usage Examples
 
 ```python
-judge = SemanticJudge(
-    model="gpt-4o-mini",    # Or gpt-4, claude, etc.
-    temperature=0.0,         # Deterministic results
-    max_tokens=500          # Response length
-)
+from semantic_unit import SemanticJudge
+
+# OpenAI (default)
+judge = SemanticJudge(model="gpt-4o-mini")
+
+# Anthropic Claude
+judge = SemanticJudge(model="claude-3-5-sonnet-20241022")
+
+# Google Gemini
+judge = SemanticJudge(model="gemini/gemini-1.5-flash")
+
+# Groq (fast inference)
+judge = SemanticJudge(model="groq/llama-3.1-70b-versatile")
+
+# Local Ollama (free, private)
+judge = SemanticJudge(model="ollama/llama3.1")
+
+# Azure OpenAI
+judge = SemanticJudge(model="azure/gpt-4o")
+
+# List all supported models
+print(SemanticJudge.list_supported_models())
 ```
 
 ## Development
@@ -207,7 +243,7 @@ judge = SemanticJudge(
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/semantic-unit.git
+git clone https://github.com/chaitanyakumar-d/semantic-unit.git
 cd semantic-unit
 
 # Create virtual environment

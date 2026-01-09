@@ -102,43 +102,120 @@ Return ONLY valid JSON in this exact format:
   "reasoning": "<detailed explanation of semantic entropy and vector alignment>"
 }"""
 
+    # Supported LLM providers via LiteLLM
+    SUPPORTED_PROVIDERS = {
+        "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
+        "anthropic": [
+            "claude-3-5-sonnet-20241022",
+            "claude-3-opus-20240229",
+            "claude-3-haiku-20240307",
+        ],
+        "google": ["gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash", "gemini/gemini-pro"],
+        "azure": ["azure/gpt-4o", "azure/gpt-4", "azure/gpt-35-turbo"],
+        "aws_bedrock": ["bedrock/anthropic.claude-3-sonnet", "bedrock/anthropic.claude-3-haiku"],
+        "ollama": ["ollama/llama3.1", "ollama/mistral", "ollama/codellama"],
+        "groq": ["groq/llama-3.1-70b-versatile", "groq/mixtral-8x7b-32768"],
+        "together": ["together_ai/meta-llama/Llama-3-70b-chat-hf"],
+        "openrouter": ["openrouter/meta-llama/llama-3.1-70b-instruct"],
+    }
+
     def __init__(
         self,
         model: str = "gpt-4o-mini",
         temperature: float = 0.0,
         max_tokens: int = 500,
         api_key: Optional[str] = None,
+        api_base: Optional[str] = None,
     ) -> None:
         """
         Initialize the semantic judge with specified model configuration.
+
+        Supports 100+ LLMs via LiteLLM including OpenAI, Anthropic, Google,
+        Azure, AWS Bedrock, Ollama (local), Groq, Together AI, and more.
 
         Parameters
         ----------
         model : str, optional
             Language model identifier (default: 'gpt-4o-mini')
+            Examples:
+            - OpenAI: "gpt-4o", "gpt-4o-mini", "gpt-4-turbo"
+            - Anthropic: "claude-3-5-sonnet-20241022", "claude-3-opus-20240229"
+            - Google: "gemini/gemini-1.5-pro", "gemini/gemini-1.5-flash"
+            - Azure: "azure/gpt-4o" (requires AZURE_API_KEY, AZURE_API_BASE)
+            - Ollama (local): "ollama/llama3.1", "ollama/mistral"
+            - Groq: "groq/llama-3.1-70b-versatile"
         temperature : float, optional
             Sampling temperature for deterministic evaluation (default: 0.0)
         max_tokens : int, optional
             Maximum response token budget (default: 500)
         api_key : str, optional
             API authentication key (default: from environment)
+        api_base : str, optional
+            Custom API base URL for self-hosted or proxy endpoints
+
+        Examples
+        --------
+        >>> # OpenAI (default)
+        >>> judge = SemanticJudge(model="gpt-4o-mini")
+
+        >>> # Anthropic Claude
+        >>> judge = SemanticJudge(model="claude-3-5-sonnet-20241022")
+
+        >>> # Google Gemini
+        >>> judge = SemanticJudge(model="gemini/gemini-1.5-flash")
+
+        >>> # Local Ollama
+        >>> judge = SemanticJudge(model="ollama/llama3.1")
+
+        >>> # Azure OpenAI
+        >>> judge = SemanticJudge(model="azure/gpt-4o")
         """
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.api_base = api_base
 
         # Configure API key from parameter or environment
+        self._configure_api_key(api_key)
+
+        self.system_prompt = self.SYSTEM_PROMPT
+
+    def _configure_api_key(self, api_key: Optional[str] = None) -> None:
+        """Configure API key based on model provider."""
         if api_key:
-            os.environ["OPENAI_API_KEY"] = api_key
-        elif not os.getenv("OPENAI_API_KEY") and not os.getenv("SEMANTIC_UNIT_API_KEY"):
-            # Allow initialization without key for testing, but will fail on actual calls
-            pass
-        else:
+            # Determine which env var to set based on model prefix
+            if self.model.startswith("claude") or self.model.startswith("anthropic/"):
+                os.environ["ANTHROPIC_API_KEY"] = api_key
+            elif self.model.startswith("gemini/"):
+                os.environ["GEMINI_API_KEY"] = api_key
+            elif self.model.startswith("azure/"):
+                os.environ["AZURE_API_KEY"] = api_key
+            elif self.model.startswith("groq/"):
+                os.environ["GROQ_API_KEY"] = api_key
+            else:
+                os.environ["OPENAI_API_KEY"] = api_key
+        elif os.getenv("SEMANTIC_UNIT_API_KEY"):
+            # Fallback to generic semantic unit key
             semantic_key = os.getenv("SEMANTIC_UNIT_API_KEY")
             if semantic_key:
                 os.environ["OPENAI_API_KEY"] = semantic_key
 
-        self.system_prompt = self.SYSTEM_PROMPT
+    @classmethod
+    def list_supported_models(cls) -> dict[str, list[str]]:
+        """
+        List all supported LLM providers and their models.
+
+        Returns
+        -------
+        dict[str, list[str]]
+            Dictionary mapping provider names to lists of model identifiers
+
+        Examples
+        --------
+        >>> SemanticJudge.list_supported_models()
+        {'openai': ['gpt-4o', 'gpt-4o-mini', ...], 'anthropic': [...], ...}
+        """
+        return cls.SUPPORTED_PROVIDERS
 
     def evaluate(
         self, actual: str, expected: str, metadata: Optional[dict[str, Any]] = None
@@ -215,17 +292,27 @@ Return ONLY valid JSON in this exact format:
         user_prompt = self._construct_prompt(actual, expected)
 
         try:
-            # Perform LLM-based semantic evaluation
-            response = litellm.completion(
-                model=self.model,
-                messages=[
+            # Build completion kwargs
+            completion_kwargs: dict[str, Any] = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": self.system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                response_format={"type": "json_object"},  # Enforce JSON output
-            )
+                "temperature": self.temperature,
+                "max_tokens": self.max_tokens,
+            }
+
+            # Add api_base if configured (for custom endpoints)
+            if self.api_base:
+                completion_kwargs["api_base"] = self.api_base
+
+            # Add JSON mode for supported models
+            if not self.model.startswith("ollama/"):
+                completion_kwargs["response_format"] = {"type": "json_object"}
+
+            # Perform LLM-based semantic evaluation
+            response = litellm.completion(**completion_kwargs)
 
             # Extract and parse response
             content = response.choices[0].message.content
