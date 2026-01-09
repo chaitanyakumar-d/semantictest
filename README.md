@@ -1,5 +1,10 @@
 # Semantic Unit: Unit Testing for AI Agents
 
+[![Tests](https://github.com/chaitanyakumar-d/semantic-unit/actions/workflows/tests.yml/badge.svg)](https://github.com/chaitanyakumar-d/semantic-unit/actions/workflows/tests.yml)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 > **Stop your AI from hallucinating in production with one line of code.**
 
 A modern testing framework that brings unit testing to AI agents. Test for **meaning**, not syntax. Catch AI hallucinations before they reach production.
@@ -41,41 +46,25 @@ assert result.score > 0.8  # ✅ Tests meaning, not exact words
 
 ## Installation
 
-### From PyPI (when published)
-
 ```bash
 pip install semantic-unit
 ```
 
-### From Source
-
-```bash
-git clone https://github.com/yourusername/semantic-unit.git
-cd semantic-unit
-pip install -e .
-```
-
-### Development Installation
-
-```bash
-pip install -e ".[dev]"
-```
-
-## Quick Start
-
-### Installation
-
-```bash
-pip install semantic-unit
-```
-
-Or from source:
+Or install from source:
 
 ```bash
 git clone https://github.com/chaitanyakumar-d/semantic-unit.git
 cd semantic-unit
 pip install -e .
 ```
+
+For development:
+
+```bash
+pip install -e ".[dev]"
+```
+
+## Quick Start
 
 ### Basic Usage
 
@@ -112,14 +101,14 @@ def judge():
 def test_ai_customer_support(judge):
     ai_response = get_ai_response("What's your return policy?")
     expected = "We accept returns within 30 days"
-    
+
     result = judge.evaluate(ai_response, expected)
     assert result.score > 0.8, f"AI hallucinated: {result.reasoning}"
 
 def test_ai_summarization(judge):
     summary = ai_summarize(long_document)
     expected_points = "Revenue increased, costs decreased, profit margins improved"
-    
+
     result = judge.evaluate(summary, expected_points)
     assert result.score > 0.7, "Summary missing key points"
 ```
@@ -274,7 +263,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **The difference?** Your AI can now:
 - Paraphrase freely without breaking tests
-- Improve responses without false failures  
+- Improve responses without false failures
 - Scale to production with confidence
 
 ## Repository & Links
@@ -295,15 +284,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [ ] Documentation website
 - [ ] Integration examples (LangChain, LlamaIndex, etc.)
 
-- GitHub: [https://github.com/yourusername/semantic-unit](https://github.com/yourusername/semantic-unit)
-- Issues: [https://github.com/yourusername/semantic-unit/issues](https://github.com/yourusername/semantic-unit/issues)
+## License
 
-## Roadmap
-
-- [ ] Core evaluation engine implementation
-- [ ] Comprehensive CLI commands
-- [ ] Extended LLM provider support
-- [ ] Documentation site
-- [ ] Example gallery
-- [ ] Plugin system
-- [ ] Performance benchmarks
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
